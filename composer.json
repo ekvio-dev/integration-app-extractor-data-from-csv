@@ -11,7 +11,7 @@
   "minimum-stability": "stable",
   "license": "MIT",
   "require": {
-    "ekvio-dev/integration-app-contracts": "^1",
+    "ekvio-dev/integration-app-contracts": "^2",
     "league/csv": "^9.0"
   },
   "autoload": {
