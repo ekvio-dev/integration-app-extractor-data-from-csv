@@ -1,6 +1,6 @@
 FROM php:7.4.2-cli-alpine
 
-LABEL Description="Csv file users extractor"
+LABEL Description="Data extractor from csv file"
 
 ENV BuildTimezone Europe/Moscow
 

@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Ekvio\Integration\Extractor\Tests;
 
-use Ekvio\Integration\Extractor\UsersFromCsv;
+use Ekvio\Integration\Extractor\DataFromCsv;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class UsersFromCsvTest
  * @package Ekvio\Integration\Extractor\Tests
  */
-class UsersFromCsvTest extends TestCase
+class DataFromCsvTest extends TestCase
 {
     public function testGetRecordsFromString()
     {
@@ -18,7 +18,7 @@ class UsersFromCsvTest extends TestCase
 "parent","child","title"
 "parentA","childA","titleA"
 EOF;
-        $extractor = UsersFromCsv::fromString($string)->setDelimiter(',')->setHeaderOffset(0);
+        $extractor = DataFromCsv::fromString($string)->setDelimiter(',')->setHeaderOffset(0);
 
         $this->assertIsArray($extractor->extract());
         $this->assertEquals(

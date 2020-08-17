@@ -1,1 +1,1 @@
-### Users from CSV extractor ###
+### Data extractor from CSV file ###

@@ -11,7 +11,7 @@ use League\Csv\Reader;
  * Class UsersFromCsv
  * @package Ekvio\Integration\Extractor
  */
-class UsersFromCsv implements Extractor
+class DataFromCsv implements Extractor
 {
     /**
      * @var Reader

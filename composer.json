@@ -1,6 +1,6 @@
 {
-  "name": "ekvio-dev/integration-app-extractor-users-from-csv",
-  "description": "Integration app users extractor from csv file",
+  "name": "ekvio-dev/integration-app-extractor-data-from-csv",
+  "description": "Integration app data extractor from csv file",
   "authors": [
     {
       "name": "Dmitry Vuylov",
