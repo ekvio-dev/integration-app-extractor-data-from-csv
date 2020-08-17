@@ -13,6 +13,8 @@ use League\Csv\Reader;
  */
 class DataFromCsv implements Extractor
 {
+    private const DEFAULT_HEADER_OFFSET = 0;
+    private const VALUE_DELIMITER = ';';
     /**
      * @var Reader
      */
@@ -28,11 +30,13 @@ class DataFromCsv implements Extractor
      * @param string $mode
      * @param null $context
      * @return static
+     * @throws Exception
      */
     public static function fromFile(string $path, string $mode = 'r', $context = null): self
     {
         $self = new self();
         $self->reader = Reader::createFromPath($path, $mode, $context);
+        $self->defaultInit();
 
         return $self;
     }
@@ -40,14 +44,26 @@ class DataFromCsv implements Extractor
     /**
      * @param string $content
      * @return static
+     * @throws Exception
      */
     public static function fromString(string $content = ''): self
     {
         $self = new self();
         $self->reader = Reader::createFromString($content);
+        $self->defaultInit();;
 
         return $self;
     }
+
+    /**
+     * @throws Exception
+     */
+    private function defaultInit(): void
+    {
+        $this->reader->setHeaderOffset(self::DEFAULT_HEADER_OFFSET);
+        $this->reader->setDelimiter(self::VALUE_DELIMITER);
+    }
+
 
     /**
      * @param string $delimiter
@@ -77,6 +93,10 @@ class DataFromCsv implements Extractor
      */
     public function extract(array $options = []): array
     {
-        return iterator_to_array($this->reader->getRecords($options));
+        $useKeys = true;
+        if(isset($options['use_keys'])) {
+            $useKeys = (bool) $options['use_keys'];
+        }
+        return iterator_to_array($this->reader->getRecords($options), $useKeys);
     }
 }
