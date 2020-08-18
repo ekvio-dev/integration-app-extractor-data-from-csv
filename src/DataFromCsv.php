@@ -18,7 +18,7 @@ class DataFromCsv implements Extractor
     private const DEFAULT_DELIMITER = ';';
     private const CREATE_FROM_PATH = 'path';
     private const CREATE_FROM_STRING = 'string';
-    private const USE_KEYS = true;
+    private const USE_KEYS = false;
 
     /**
      * @var array
@@ -28,7 +28,10 @@ class DataFromCsv implements Extractor
         'content' => '',
         'path' => null,
         'mode' => 'r',
-        'context' => null
+        'context' => null,
+        'delimiter' => self::DEFAULT_DELIMITER,
+        'offset' => self::DEFAULT_HEADER_OFFSET,
+        'use_keys' => self::USE_KEYS
     ];
 
     /**
@@ -68,6 +71,19 @@ class DataFromCsv implements Extractor
 
     /**
      * @param array $options
+     * @return $this
+     */
+    public function configure(array $options): self
+    {
+        $this->options['delimiter'] = $options['delimiter'] ?? self::DEFAULT_DELIMITER;
+        $this->options['offset'] = $options['offset'] ?? self::DEFAULT_HEADER_OFFSET;
+        $this->options['use_keys'] = $options['use_keys'] ?? self::USE_KEYS;
+
+        return $this;
+    }
+
+    /**
+     * @param array $options
      * @return array
      * @throws Exception
      */
@@ -76,7 +92,7 @@ class DataFromCsv implements Extractor
         $options = array_replace_recursive($this->options, $options);
         $reader = $this->buildReader($options);
 
-        return iterator_to_array($reader->getRecords($options['header'] ?? []), $options['user_keys'] ?? self::USE_KEYS);
+        return iterator_to_array($reader->getRecords($options['header'] ?? []), $options['use_keys'] ?? self::USE_KEYS);
     }
 
     /**
