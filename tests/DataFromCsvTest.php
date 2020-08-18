@@ -18,12 +18,13 @@ class DataFromCsvTest extends TestCase
 "parent","child","title"
 "parentA","childA","titleA"
 EOF;
-        $extractor = DataFromCsv::fromString($string)->setDelimiter(',')->setHeaderOffset(0);
+        $extractor = DataFromCsv::fromString($string);
+        $extracted = $extractor->extract(['delimiter' => ',', 'offset' => 0]);
 
-        $this->assertIsArray($extractor->extract());
+        $this->assertIsArray($extracted);
         $this->assertEquals(
             [1 => ['parent' => 'parentA', 'child' => 'childA', 'title' => 'titleA']],
-            $extractor->extract()
+            $extracted
         );
     }
 }

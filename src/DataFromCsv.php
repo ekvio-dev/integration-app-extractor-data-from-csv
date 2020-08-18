@@ -6,6 +6,7 @@ namespace Ekvio\Integration\Extractor;
 use Ekvio\Integration\Contracts\Extractor;
 use League\Csv\Exception;
 use League\Csv\Reader;
+use RuntimeException;
 
 /**
  * Class UsersFromCsv
@@ -14,11 +15,21 @@ use League\Csv\Reader;
 class DataFromCsv implements Extractor
 {
     private const DEFAULT_HEADER_OFFSET = 0;
-    private const VALUE_DELIMITER = ';';
+    private const DEFAULT_DELIMITER = ';';
+    private const CREATE_FROM_PATH = 'path';
+    private const CREATE_FROM_STRING = 'string';
+    private const USE_KEYS = true;
+
     /**
-     * @var Reader
+     * @var array
      */
-    private $reader;
+    private $options = [
+        'from' => self::CREATE_FROM_PATH,
+        'content' => '',
+        'path' => null,
+        'mode' => 'r',
+        'context' => null
+    ];
 
     /**
      * UsersFromCsv constructor.
@@ -30,13 +41,14 @@ class DataFromCsv implements Extractor
      * @param string $mode
      * @param null $context
      * @return static
-     * @throws Exception
      */
     public static function fromFile(string $path, string $mode = 'r', $context = null): self
     {
         $self = new self();
-        $self->reader = Reader::createFromPath($path, $mode, $context);
-        $self->defaultInit();
+        $self->options['from'] = self::CREATE_FROM_PATH;
+        $self->options['path'] = $path;
+        $self->options['mode'] = $mode;
+        $self->options['context'] = $context;
 
         return $self;
     }
@@ -44,59 +56,50 @@ class DataFromCsv implements Extractor
     /**
      * @param string $content
      * @return static
-     * @throws Exception
      */
     public static function fromString(string $content = ''): self
     {
         $self = new self();
-        $self->reader = Reader::createFromString($content);
-        $self->defaultInit();;
+        $self->options['from'] = self::CREATE_FROM_STRING;
+        $self->options['content'] = $content;
 
         return $self;
     }
 
     /**
+     * @param array $options
+     * @return array
      * @throws Exception
      */
-    private function defaultInit(): void
+    public function extract(array $options = []): array
     {
-        $this->reader->setHeaderOffset(self::DEFAULT_HEADER_OFFSET);
-        $this->reader->setDelimiter(self::VALUE_DELIMITER);
-    }
+        $options = array_replace_recursive($this->options, $options);
+        $reader = $this->buildReader($options);
 
-
-    /**
-     * @param string $delimiter
-     * @return $this
-     * @throws Exception
-     */
-    public function setDelimiter(string $delimiter): self
-    {
-        $this->reader->setDelimiter($delimiter);
-        return $this;
-    }
-
-    /**
-     * @param int $offset
-     * @return $this
-     * @throws Exception
-     */
-    public function setHeaderOffset(int $offset): self
-    {
-        $this->reader->setHeaderOffset($offset);
-        return $this;
+        return iterator_to_array($reader->getRecords($options['header'] ?? []), $options['user_keys'] ?? self::USE_KEYS);
     }
 
     /**
      * @param array $options
-     * @return array
+     * @return Reader
+     * @throws Exception
      */
-    public function extract(array $options = []): array
+    private function buildReader(array $options): Reader
     {
-        $useKeys = true;
-        if(isset($options['use_keys'])) {
-            $useKeys = (bool) $options['use_keys'];
+        switch ($options['from']) {
+            case self::CREATE_FROM_PATH:
+                $reader = Reader::createFromPath($options['path'], $options['mode'], $options['context']);
+                break;
+            case self::CREATE_FROM_STRING:
+                $reader = Reader::createFromString($options['content']);
+                break;
+            default:
+                throw new RuntimeException(sprintf('Unknown %s for Reader instance', $options['from']));
         }
-        return iterator_to_array($this->reader->getRecords($options), $useKeys);
+
+        $reader->setDelimiter($options['delimiter'] ?? self::DEFAULT_DELIMITER);
+        $reader->setHeaderOffset($options['offset'] ?? self::DEFAULT_HEADER_OFFSET);
+
+        return $reader;
     }
 }
