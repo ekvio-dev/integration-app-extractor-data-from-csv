@@ -6,6 +6,7 @@ namespace Ekvio\Integration\Extractor;
 use Ekvio\Integration\Contracts\Extractor;
 use League\Csv\Exception;
 use League\Csv\Reader;
+use League\Csv\Statement;
 use RuntimeException;
 
 /**
@@ -21,6 +22,23 @@ class DataFromCsv implements Extractor
     private const USE_KEYS = false;
 
     /**
+     * @var string
+     */
+    private $delimiter = self::DEFAULT_DELIMITER;
+    /**
+     * @var int
+     */
+    private $headerOffset = self::DEFAULT_HEADER_OFFSET;
+    /**
+     * @var bool
+     */
+    private $useKeys = self::USE_KEYS;
+    /**
+     * @var Statement
+     */
+    private $statement;
+
+    /**
      * @var array
      */
     private $options = [
@@ -29,9 +47,6 @@ class DataFromCsv implements Extractor
         'path' => null,
         'mode' => 'r',
         'context' => null,
-        'delimiter' => self::DEFAULT_DELIMITER,
-        'offset' => self::DEFAULT_HEADER_OFFSET,
-        'use_keys' => self::USE_KEYS
     ];
 
     /**
@@ -70,15 +85,42 @@ class DataFromCsv implements Extractor
     }
 
     /**
-     * @param array $options
+     * @param string $delimiter
      * @return $this
      */
-    public function configure(array $options): self
+    public function delimiter(string $delimiter): self
     {
-        $this->options['delimiter'] = $options['delimiter'] ?? self::DEFAULT_DELIMITER;
-        $this->options['offset'] = $options['offset'] ?? self::DEFAULT_HEADER_OFFSET;
-        $this->options['use_keys'] = $options['use_keys'] ?? self::USE_KEYS;
+        $this->delimiter = $delimiter;
+        return $this;
+    }
 
+    /**
+     * @param int|null $offset
+     * @return $this
+     */
+    public function headerOffset(?int $offset): self
+    {
+        $this->headerOffset = $offset;
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function useKeys(bool $flag): self
+    {
+        $this->useKeys = $flag;
+        return $this;
+    }
+
+    /**
+     * @param Statement $statement
+     * @return $this
+     */
+    public function statement(Statement $statement): self
+    {
+        $this->statement = $statement;
         return $this;
     }
 
@@ -89,33 +131,36 @@ class DataFromCsv implements Extractor
      */
     public function extract(array $options = []): array
     {
-        $options = array_replace_recursive($this->options, $options);
-        $reader = $this->buildReader($options);
+        $reader = $this->buildReader();
+        $header = $options['header'] ?? [];
 
-        return iterator_to_array($reader->getRecords($options['header'] ?? []), $options['use_keys'] ?? self::USE_KEYS);
+        if($this->statement) {
+            $processed = $this->statement->process($reader);
+            return iterator_to_array($processed->getRecords($header), $this->useKeys);
+        }
+
+        return iterator_to_array($reader->getRecords($header), $this->useKeys);
     }
 
     /**
-     * @param array $options
      * @return Reader
      * @throws Exception
      */
-    private function buildReader(array $options): Reader
+    private function buildReader(): Reader
     {
-        switch ($options['from']) {
+        switch ($this->options['from']) {
             case self::CREATE_FROM_PATH:
-                $reader = Reader::createFromPath($options['path'], $options['mode'], $options['context']);
+                $reader = Reader::createFromPath($this->options['path'], $this->options['mode'], $this->options['context']);
                 break;
             case self::CREATE_FROM_STRING:
-                $reader = Reader::createFromString($options['content']);
+                $reader = Reader::createFromString($this->options['content']);
                 break;
             default:
-                throw new RuntimeException(sprintf('Unknown %s for Reader instance', $options['from']));
+                throw new RuntimeException(sprintf('Unknown %s for Reader instance',$this->options['from']));
         }
 
-        $reader->setDelimiter($options['delimiter'] ?? self::DEFAULT_DELIMITER);
-        $reader->setHeaderOffset($options['offset'] ?? self::DEFAULT_HEADER_OFFSET);
-
-        return $reader;
+        return $reader
+            ->setDelimiter($this->delimiter)
+            ->setHeaderOffset($this->headerOffset);
     }
 }
