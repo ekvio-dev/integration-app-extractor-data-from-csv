@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ebdb7c400872e4304eea09fa9e145c6",
+    "content-hash": "50b5fbd5f2fa3bf3848d36790fe49d41",
     "packages": [
         {
             "name": "ekvio-dev/integration-app-contracts",
-            "version": "2.0.1",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ekvio-dev/integration-app-contracts.git",
-                "reference": "ccd0b6751191ca9eeacf9233603fb3e0ab7fcce8"
+                "reference": "82e76912795471458446c7906c2afb07f2c220f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ekvio-dev/integration-app-contracts/zipball/ccd0b6751191ca9eeacf9233603fb3e0ab7fcce8",
-                "reference": "ccd0b6751191ca9eeacf9233603fb3e0ab7fcce8",
+                "url": "https://api.github.com/repos/ekvio-dev/integration-app-contracts/zipball/82e76912795471458446c7906c2afb07f2c220f0",
+                "reference": "82e76912795471458446c7906c2afb07f2c220f0",
                 "shasum": ""
             },
             "require": {
@@ -40,7 +40,7 @@
                 }
             ],
             "description": "Equeo integration application contracts",
-            "time": "2020-08-10T13:19:37+00:00"
+            "time": "2020-09-03T06:06:51+00:00"
         },
         {
             "name": "league/csv",
