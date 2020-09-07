@@ -15,6 +15,7 @@ use RuntimeException;
  */
 class DataFromCsv implements Extractor
 {
+    public const NAME = 'From CSV file extractor';
     private const DEFAULT_HEADER_OFFSET = 0;
     private const DEFAULT_DELIMITER = ';';
     private const CREATE_FROM_PATH = 'path';
@@ -162,5 +163,13 @@ class DataFromCsv implements Extractor
         return $reader
             ->setDelimiter($this->delimiter)
             ->setHeaderOffset($this->headerOffset);
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return self::NAME;
     }
 }
