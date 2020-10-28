@@ -133,7 +133,11 @@ class DataFromCsv implements Extractor
     public function extract(array $options = []): array
     {
         $reader = $this->buildReader();
-        $header = $options['header'] ?? [];
+        $header = $options['header'] ?? $reader->getHeader();
+
+        if($header) {
+            $header = $this->filterHeaders($header);
+        }
 
         if($this->statement) {
             $processed = $this->statement->process($reader);
@@ -163,6 +167,13 @@ class DataFromCsv implements Extractor
         return $reader
             ->setDelimiter($this->delimiter)
             ->setHeaderOffset($this->headerOffset);
+    }
+
+    private function filterHeaders(array $header): array
+    {
+        return array_map(function (string $head){
+            return mb_strtoupper(trim($head));
+        }, $header);
     }
 
     /**

@@ -12,7 +12,8 @@
   "license": "MIT",
   "require": {
     "ekvio-dev/integration-app-contracts": "^3",
-    "league/csv": "^9.0"
+    "league/csv": "^9.0",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {

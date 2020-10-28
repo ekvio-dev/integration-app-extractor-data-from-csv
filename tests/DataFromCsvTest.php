@@ -27,7 +27,7 @@ EOF;
 
         $this->assertIsArray($extracted);
         $this->assertEquals(
-            ['parent' => 'parentA', 'child' => 'childA', 'title' => 'titleA'],
+            ['PARENT' => 'parentA', 'CHILD' => 'childA', 'TITLE' => 'titleA'],
             array_shift($extracted)
         );
     }
@@ -35,7 +35,7 @@ EOF;
     public function testGetRecordsWithStatement()
     {
         $string = <<<EOF
-"parent"|"child"|"title"
+" parent "|" child "|" title "
 "parentA"|"childA"|"titleA"
 "parentB"|"childB"|"titleB"
 "parentC"|"childC"|"titleC"
@@ -48,9 +48,13 @@ EOF;
 
         $extracted = $extractor->extract();
         $this->assertIsArray($extracted);
+
+        $element = array_shift($extracted);
+
+        $this->assertEquals(['PARENT', 'CHILD', 'TITLE'], array_keys($element));
         $this->assertEquals(
-            ['parent' => 'parentC', 'child' => 'childC', 'title' => 'titleC'],
-            array_shift($extracted)
+            ['PARENT' => 'parentC', 'CHILD' => 'childC', 'TITLE' => 'titleC'],
+            $element
         );
     }
 }
